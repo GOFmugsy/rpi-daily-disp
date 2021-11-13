@@ -1,7 +1,15 @@
+#!/usr/bin/env python3
+
 import urllib.request
 import json
+import config as cfg
 
-api = ""
+api = cfg.apikey
+
+if not api:
+    print("need an api key")
+    exit()
+
 apiJson = urllib.request.urlopen("https://api.nytimes.com/svc/mostpopular/v2/viewed/1.json?api-key=" + api).read()
 decode = apiJson.decode('utf-8')
 apiDict = json.loads(decode)

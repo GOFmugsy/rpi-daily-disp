@@ -1,1 +1,3 @@
 apikey
+config.py
+*pycache*
