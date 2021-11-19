@@ -24,6 +24,11 @@
   # Enable OpenSSH out of the box.
   services.sshd.enable = true;
 
+  environment.systemPackages = with pkgs; [ 
+	vim
+	git
+  ];
+
   # Wireless networking (1). You might want to enable this if your Pi is not attached via Ethernet.
   networking.wireless = {
     enable = true;
