@@ -1,0 +1,3 @@
+[submodule "nixos/nixos-docker-sd-image-builder"]
+	path = nixos/nixos-docker-sd-image-builder
+	url = git@github.com:Robertof/nixos-docker-sd-image-builder.git
