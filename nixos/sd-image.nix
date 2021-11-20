@@ -1,4 +1,4 @@
-{ lib, ... }: {
+{ lib, pkgs, ... }: {
   imports = [
     ## Uncomment at most one of the following to select the target system:
     # ./generic-aarch64 # (note: this is the same as 'rpi3')
@@ -9,7 +9,7 @@
   # The installer starts with a "nixos" user to allow installation, so add the SSH key to
   # that user. Note that the key is, at the time of writing, put in `/etc/ssh/authorized_keys.d`
   users.extraUsers.nixos.openssh.authorizedKeys.keys = [
-    "ssh-public-key"
+    ""
   ];
 
   # bzip2 compression takes loads of time with emulation, skip it. Enable this if you're low
@@ -24,9 +24,9 @@
   # Enable OpenSSH out of the box.
   services.sshd.enable = true;
 
-  environment.systemPackages = with pkgs; [ 
-	vim
-	git
+  environment.systemPackages = [ 
+	pkgs.vim
+	pkgs.git
   ];
 
   # Wireless networking (1). You might want to enable this if your Pi is not attached via Ethernet.
@@ -34,8 +34,8 @@
     enable = true;
     interfaces = [ "wlan0" ];
     networks = {
-      "your-ssid" = {
-        psk = "your-wifi-pw";
+      "" = {
+        psk = "";
       };
     };
   };
