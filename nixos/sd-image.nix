@@ -1,4 +1,4 @@
-{ lib, pkgs, ... }: {
+{ config, lib, pkgs, ... }: {
   imports = [
     ## Uncomment at most one of the following to select the target system:
     # ./generic-aarch64 # (note: this is the same as 'rpi3')
@@ -8,9 +8,35 @@
 
   # The installer starts with a "nixos" user to allow installation, so add the SSH key to
   # that user. Note that the key is, at the time of writing, put in `/etc/ssh/authorized_keys.d`
-  users.extraUsers.nixos.openssh.authorizedKeys.keys = [
-    ""
-  ];
+
+  # add user with gpio group
+  users = {
+    groups.gpio = {};
+    groups.spi = {};
+    extraUsers.nixos = {
+      openssh.authorizedKeys.keys = [
+        ""
+      ];
+      extraGroups = [ "wheel" "gpio" "spi" ];
+    };
+  };
+
+  services.udev.packages = [ 
+    ( pkgs.writeTextFile {
+      name = "gpio_udev";
+      text = ''
+        KERNEL=="gpiomem", OWNER="root", GROUP="gpio"
+      '';
+      destination = "/lib/udev/rules.d/90-gpio.rules";
+    })
+    ( pkgs.writeTextFile { 
+      name = "spi_udev";
+      text = ''
+        KERNEL=="spidev0.0", OWNER="root", GROUP="spi"
+      '';
+      destination = "/lib/udev/rules.d/90-spi.rules";
+    } )
+   ];
 
   # bzip2 compression takes loads of time with emulation, skip it. Enable this if you're low
   # on space.
