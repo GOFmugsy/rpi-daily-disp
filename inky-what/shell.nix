@@ -1,6 +1,34 @@
 with import <nixpkgs> {};
 let
 
+  fonts-i = pkgs.python38Packages.buildPythonPackage rec {
+    pname = "font-intuitive";
+    version = "0.0.4";
+ 
+    src = pkgs.python38Packages.fetchPypi {
+      inherit pname version;
+      sha256 = "f5744edf796949252bf3c8feb29b4c685c3e76f7848be638d3a9512e4730ee80";
+    };
+
+    propagatedBuildInputs = with pkgs.python38Packages; [ h2 multidict ];
+
+    doCheck = false;
+  };
+
+  fonts-hk = pkgs.python38Packages.buildPythonPackage rec {
+    pname = "font-hanken-grotesk";
+    version = "0.0.2";
+ 
+    src = pkgs.python38Packages.fetchPypi {
+      inherit pname version;
+      sha256 = "3bb66ce05819ff8ccd563e039dec462912579b8290f143152459865740723f39";
+    };
+
+    propagatedBuildInputs = with pkgs.python38Packages; [ h2 multidict ];
+
+    doCheck = false;
+  };
+
   fonts = pkgs.python38Packages.buildPythonPackage rec {
     pname = "fonts";
     version = "0.0.3";
@@ -10,7 +38,7 @@ let
       sha256 = "c626655b75a60715e118e44e270656fd22fd8f54252901ff6ebf1308ad01c405";
     };
 
-    propagatedBuildInputs = with pkgs.python38Packages; [ h2 multidict ];
+    propagatedBuildInputs = with pkgs.python38Packages; [ h2 multidict fonts-hk fonts-i ];
 
     doCheck = false;
   };

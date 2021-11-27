@@ -1,3 +1,4 @@
 apikey
 config.py
 *pycache*
+*.swp
