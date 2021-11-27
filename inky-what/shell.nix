@@ -1,11 +1,5 @@
 with import <nixpkgs> {};
 let
-  pythonEnv = python3.withPackages (ps: [
-    ps.numpy
-    ps.toolz
-    ps.pillow
-    ps.pip
-  ]);
 
   fonts = pkgs.python38Packages.buildPythonPackage rec {
     pname = "fonts";
@@ -58,13 +52,13 @@ let
       sha256 = "5eeee0a35314f76af3a614805db0227952aaa22d062f280eafe7d0ae40a01cce";
     };
 
-    propagatedBuildInputs = with pkgs.python38Packages; [ h2 multidict spidev numpy pillow smbus2 rpi.gpio ];
+    propagatedBuildInputs = with pkgs.python38Packages; [ h2 multidict spidev numpy pillow smbus2 rpi.gpio fonts setuptools ];
 
     doCheck = false;
   };
 
   customPython = pkgs.python38.buildEnv.override {
-    extraLibs = [ inky ];
+    extraLibs = [ inky fonts ];
   };
 in mkShell {
   buildInputs = [
@@ -72,10 +66,7 @@ in mkShell {
     customPython
   ];
   packages = [
-    python3
-    pythonEnv
     black
-    mypy
     libffi
     openssl
   ];
