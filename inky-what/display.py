@@ -6,6 +6,7 @@ from PIL import Image, ImageFont, ImageDraw
 from font_hanken_grotesk import HankenGroteskBold, HankenGroteskMedium
 from font_intuitive import Intuitive
 from inky.auto import auto
+import math
 
 try:
     inky_display = auto(ask_user=True, verbose=True)
@@ -62,12 +63,18 @@ weatherTop = 0
 weatherBottom = int(inky_display.height * .4)
 weatherLeft = int(inky_display.width - (inky_display.width * .3))
 weatherRight = int(inky_display.width)
+weatherCenter = [int((weatherLeft + weatherRight)/2),int((weatherBottom + weatherTop)/2)]
+r = 20
 
 for y in range(weatherTop, weatherBottom):
     img.putpixel((weatherLeft,y), inky_display.BLACK)
 for x in range(weatherLeft, weatherRight):
     img.putpixel((x,weatherBottom), inky_display.BLACK)
 
+for x in range(weatherLeft, weatherRight):
+    for y in range(weatherTop, weatherBottom):
+        if math.sqrt((x - weatherCenter[0])**2 + (y - weatherCenter[1])**2) < r:
+            img.putpixel((x, y), inky_display.RED)
 
 # headlines-box
 
