@@ -6,7 +6,35 @@ from PIL import Image, ImageFont, ImageDraw
 from font_hanken_grotesk import HankenGroteskBold, HankenGroteskMedium
 from font_intuitive import Intuitive
 from inky.auto import auto
+import urllib.request
+import json
+import config as cfg
 import math
+
+def drawSun():
+    for x in range(weatherLeft, weatherRight):
+        for y in range(weatherTop, weatherBottom):
+            if math.sqrt((x - weatherCenter[0])**2 + (y - weatherCenter[1])**2) < r:
+                img.putpixel((x, y), inky_display.RED)
+
+# def getHeadlines():
+
+def getWeather():
+    forecast = ""
+    latlong = cfg.latlong
+    
+    pointsApiJson = urllib.request.urlopen("https://api.weather.gov/points/" + latlong).read()
+    pointsApiDict = json.loads(pointsApiJson)
+    
+    forecastApi = pointsApiDict["properties"]["forecast"]
+    forecastApiJson = urllib.request.urlopen(forecastApi).read()
+    forecastApiDict = json.loads(forecastApiJson)
+    forecastTime = forecastApiDict["properties"]["updated"]
+    forecasts = forecastApiDict["properties"]["periods"]
+
+    for i in forecasts:
+        forecast = forecast + i["name"] + " - " + str(i["temperature"]) + i["temperatureUnit"] + " - " + i["shortForecast"] + "\n"
+    return forecast
 
 try:
     inky_display = auto(ask_user=True, verbose=True)
@@ -71,10 +99,8 @@ for y in range(weatherTop, weatherBottom):
 for x in range(weatherLeft, weatherRight):
     img.putpixel((x,weatherBottom), inky_display.BLACK)
 
-for x in range(weatherLeft, weatherRight):
-    for y in range(weatherTop, weatherBottom):
-        if math.sqrt((x - weatherCenter[0])**2 + (y - weatherCenter[1])**2) < r:
-            img.putpixel((x, y), inky_display.RED)
+forecast = getWeather()
+print(forecast.split('\n')[0:3])
 
 # headlines-box
 
