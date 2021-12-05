@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 import argparse
-
+import textwrap
+import re
 from PIL import Image, ImageFont, ImageDraw
 from font_hanken_grotesk import HankenGroteskBold, HankenGroteskMedium
 from font_intuitive import Intuitive
@@ -35,6 +36,26 @@ def getWeather():
     for i in forecasts:
         forecast = forecast + i["name"] + " - " + str(i["temperature"]) + i["temperatureUnit"] + " - " + i["shortForecast"] + "\n"
     return forecast
+
+def getHeadlines():
+    headlinestr = ''
+    api = cfg.apikey
+
+    if not api:
+        print("Need NYT API key")
+        exit()
+
+    apiJson = urllib.request.urlopen("https://api.nytimes.com/svc/mostpopular/v2/viewed/1.json?api-key=" + api).read()
+    decode = apiJson.decode('utf-8')
+    apiDict = json.loads(decode)
+
+    i = 0
+    for article in apiDict["results"]:
+        i = i + 1
+        if i > 3: 
+            continue
+        headlinestr = headlinestr + article["title"] + "\n"
+        headlinestr = headlinestr + article["abstract"] + "\n"
 
 try:
     inky_display = auto(ask_user=True, verbose=True)
@@ -78,6 +99,8 @@ draw = ImageDraw.Draw(img)
 intuitive_font = ImageFont.truetype(Intuitive, int(22 * scale_size))
 hanken_bold_font = ImageFont.truetype(HankenGroteskBold, int(35 * scale_size))
 hanken_medium_font = ImageFont.truetype(HankenGroteskMedium, int(16 * scale_size))
+ebeFont = ImageFont.truetype(font='./ebe.ttf', size=int(10 * scale_size))
+teleFont = ImageFont.truetype(font='./tele.ttf', size=int(10 * scale_size))
 
 # Grab the name to be displayed
 
@@ -100,7 +123,42 @@ for x in range(weatherLeft, weatherRight):
     img.putpixel((x,weatherBottom), inky_display.BLACK)
 
 forecast = getWeather()
-print(forecast.split('\n')[0:3])
+toShow = forecast.split('\n')[0:3]
+
+font = teleFont
+totalH = 0
+totalW = 0
+maxDayW = 0
+maxTempW = 0
+for i in toShow:
+    w, h = font.getsize(i)
+    totalH = totalH + h
+    totalW = totalW + w
+    for j, val in enumerate(i.split(' - ')):
+        if j == 0:
+            val = re.sub('This ', '', val)
+        vw, vh = font.getsize(val)
+        if j == 0 and vw > maxDayW:
+            maxDayW = vw
+        elif j == 1 and vw > maxTempW:
+            maxTempW = vw
+
+print("totalW: " + str(totalW) + ", totalH: " + str(totalH))
+line = inky_display.height
+wpadding = 10
+for i in reversed(toShow):
+    w, h = font.getsize(i)
+    line = line - h
+    for j, val in enumerate(i.split(' - ')):
+        x = 0
+        if j == 0: # time
+            val = re.sub('This ', '', val)
+            x = 0
+        elif j == 1: # temp
+            x = maxDayW + wpadding
+        elif j == 2: # forecast
+            x = maxDayW + wpadding + maxTempW + wpadding
+        draw.text((x, line), val, inky_display.BLACK, font=font)
 
 # headlines-box
 
