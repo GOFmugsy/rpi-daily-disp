@@ -12,6 +12,8 @@ import json
 import config as cfg
 import math
 
+days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
+
 def drawSun():
     for x in range(weatherLeft, weatherRight):
         for y in range(weatherTop, weatherBottom):
@@ -102,7 +104,8 @@ hanken_bold_font = ImageFont.truetype(HankenGroteskBold, int(35 * scale_size))
 hanken_medium_font = ImageFont.truetype(HankenGroteskMedium, int(16 * scale_size))
 ebeFont = ImageFont.truetype(font='./ebe.ttf', size=int(10 * scale_size))
 teleFont = ImageFont.truetype(font='./tele.ttf', size=int(10 * scale_size))
-timeFont = ImageFont.truetype(font='./tele.ttf', size=int(32 * scale_size))
+dateFont = ImageFont.truetype(font='./tele.ttf', size=int(18 * scale_size))
+timeFont = ImageFont.truetype(font='./tele.ttf', size=int(48 * scale_size))
 
 # Grab the name to be displayed
 
@@ -168,8 +171,12 @@ now = datetime.now()
 now = now - timedelta(hours=-7)
 time = now.strftime("%H:%M")
 date = now.strftime("%m/%d/%Y")
+day = days[now.weekday()]
+vPadding = 2
 
 draw.text((0,0), time, inky_display.BLACK, font=timeFont)
+timew, timeh = timeFont.getsize(time)
+draw.text((0,timeh + vPadding), day + " " + date, inky_display.BLACK, font=dateFont)
 
 # Draw the red, white, and red strips
 
