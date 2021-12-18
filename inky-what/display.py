@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
 import argparse
-import textwrap
 import re
 from PIL import Image, ImageFont, ImageDraw
 from font_hanken_grotesk import HankenGroteskBold, HankenGroteskMedium
 from font_intuitive import Intuitive
 from inky.auto import auto
+from datetime import datetime, timedelta
 import urllib.request
 import json
 import config as cfg
@@ -56,6 +56,7 @@ def getHeadlines():
             continue
         headlinestr = headlinestr + article["title"] + "\n"
         headlinestr = headlinestr + article["abstract"] + "\n"
+    return headlinestr
 
 try:
     inky_display = auto(ask_user=True, verbose=True)
@@ -101,6 +102,7 @@ hanken_bold_font = ImageFont.truetype(HankenGroteskBold, int(35 * scale_size))
 hanken_medium_font = ImageFont.truetype(HankenGroteskMedium, int(16 * scale_size))
 ebeFont = ImageFont.truetype(font='./ebe.ttf', size=int(10 * scale_size))
 teleFont = ImageFont.truetype(font='./tele.ttf', size=int(10 * scale_size))
+timeFont = ImageFont.truetype(font='./tele.ttf', size=int(32 * scale_size))
 
 # Grab the name to be displayed
 
@@ -110,17 +112,17 @@ teleFont = ImageFont.truetype(font='./tele.ttf', size=int(10 * scale_size))
 
 # weather-box
 
-weatherTop = 0
-weatherBottom = int(inky_display.height * .4)
-weatherLeft = int(inky_display.width - (inky_display.width * .3))
-weatherRight = int(inky_display.width)
-weatherCenter = [int((weatherLeft + weatherRight)/2),int((weatherBottom + weatherTop)/2)]
-r = 20
+# weatherTop = 0
+# weatherBottom = int(inky_display.height * .4)
+# weatherLeft = int(inky_display.width - (inky_display.width * .3))
+# weatherRight = int(inky_display.width)
+# weatherCenter = [int((weatherLeft + weatherRight)/2),int((weatherBottom + weatherTop)/2)]
+# r = 20
 
-for y in range(weatherTop, weatherBottom):
-    img.putpixel((weatherLeft,y), inky_display.BLACK)
-for x in range(weatherLeft, weatherRight):
-    img.putpixel((x,weatherBottom), inky_display.BLACK)
+# for y in range(weatherTop, weatherBottom):
+    # img.putpixel((weatherLeft,y), inky_display.BLACK)
+# for x in range(weatherLeft, weatherRight):
+    # img.putpixel((x,weatherBottom), inky_display.BLACK)
 
 forecast = getWeather()
 toShow = forecast.split('\n')[0:3]
@@ -160,17 +162,14 @@ for i in reversed(toShow):
             x = maxDayW + wpadding + maxTempW + wpadding
         draw.text((x, line), val, inky_display.BLACK, font=font)
 
-# headlines-box
+# date-time
 
-headTop = weatherBottom
-headBottom = inky_display.height
-headLeft = 0
-headRight = inky_display.width
+now = datetime.now()
+now = now - timedelta(hours=-7)
+time = now.strftime("%H:%M")
+date = now.strftime("%m/%d/%Y")
 
-for x in range(headLeft, headRight):
-    img.putpixel((x,headTop), inky_display.BLACK)
-
-# cal-box
+draw.text((0,0), time, inky_display.BLACK, font=timeFont)
 
 # Draw the red, white, and red strips
 
