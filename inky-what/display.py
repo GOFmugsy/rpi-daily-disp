@@ -174,9 +174,17 @@ date = now.strftime("%m/%d/%Y")
 day = days[now.weekday()]
 vPadding = 2
 
-draw.text((0,0), time, inky_display.BLACK, font=timeFont)
+draw.text((0,vPadding), time, inky_display.BLACK, font=timeFont)
 timew, timeh = timeFont.getsize(time)
 draw.text((0,timeh + vPadding), day + " " + date, inky_display.BLACK, font=dateFont)
+datew, dateh = dateFont.getsize(day + " " + date)
+
+# headlines
+
+headlines = getHeadlines()
+for i,headline in enumerate(headlines.split('\n')):
+	headlinew, headlineh, = font.getsize(headline)
+	draw.text((0, vPadding + timeh + vPadding + dateh + vPadding + ((vPadding + headlineh) * i)), headline, inky_display.BLACK, font=font)
 
 # Draw the red, white, and red strips
 
