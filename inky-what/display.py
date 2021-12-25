@@ -20,8 +20,6 @@ def drawSun():
             if math.sqrt((x - weatherCenter[0])**2 + (y - weatherCenter[1])**2) < r:
                 img.putpixel((x, y), inky_display.RED)
 
-# def getHeadlines():
-
 def getWeather():
     forecast = ""
     latlong = cfg.latlong
@@ -39,9 +37,10 @@ def getWeather():
         forecast = forecast + i["name"] + " - " + str(i["temperature"]) + i["temperatureUnit"] + " - " + i["shortForecast"] + "\n"
     return forecast
 
-def getHeadlines():
-    headlinestr = ''
+# return 2d arr of [[headline, summary], [hl, sum], ... ]
+def getNews():
     api = cfg.apikey
+    news = []
 
     if not api:
         print("Need NYT API key")
@@ -56,9 +55,9 @@ def getHeadlines():
         i = i + 1
         if i > 3: 
             continue
-        headlinestr = headlinestr + article["title"] + "\n"
-        headlinestr = headlinestr + article["abstract"] + "\n"
-    return headlinestr
+        news.append([article["title"], article["abstract"]])
+    
+    return news
 
 try:
     inky_display = auto(ask_user=True, verbose=True)
@@ -102,10 +101,12 @@ draw = ImageDraw.Draw(img)
 intuitive_font = ImageFont.truetype(Intuitive, int(22 * scale_size))
 hanken_bold_font = ImageFont.truetype(HankenGroteskBold, int(35 * scale_size))
 hanken_medium_font = ImageFont.truetype(HankenGroteskMedium, int(16 * scale_size))
-ebeFont = ImageFont.truetype(font='./ebe.ttf', size=int(10 * scale_size))
+# ebeFont = ImageFont.truetype(font='./ebe.ttf', size=int(10 * scale_size))
 teleFont = ImageFont.truetype(font='./tele.ttf', size=int(10 * scale_size))
 dateFont = ImageFont.truetype(font='./tele.ttf', size=int(18 * scale_size))
 timeFont = ImageFont.truetype(font='./tele.ttf', size=int(48 * scale_size))
+headlineFont = ImageFont.truetype(font='./roboto.ttf', size=int(8 * scale_size))
+articleFont = ImageFont.truetype(font='./arimo.ttf', size=int(8 * scale_size))
 
 # Grab the name to be displayed
 
@@ -168,10 +169,10 @@ for i in reversed(toShow):
 # date-time
 
 now = datetime.now()
-now = now - timedelta(hours=-7)
+# now = now - timedelta(hours=-7)
 time = now.strftime("%H:%M")
 date = now.strftime("%m/%d/%Y")
-day = days[now.weekday()]
+day = days[now.weekday() + 1]
 vPadding = 2
 
 draw.text((0,vPadding), time, inky_display.BLACK, font=timeFont)
@@ -181,10 +182,12 @@ datew, dateh = dateFont.getsize(day + " " + date)
 
 # headlines
 
-headlines = getHeadlines()
-for i,headline in enumerate(headlines.split('\n')):
-	headlinew, headlineh, = font.getsize(headline)
-	draw.text((0, vPadding + timeh + vPadding + dateh + vPadding + ((vPadding + headlineh) * i)), headline, inky_display.BLACK, font=font)
+font = headlineFont
+news = getNews()
+for i,headline in enumerate(news):
+	headlinew, headlineh = font.getsize(headline[0])
+	summaryw, summaryh = font.getsize(headline[1])
+	draw.text((0, vPadding + timeh + vPadding + dateh + vPadding + ((vPadding + headlineh) * i)), headline[0], inky_display.BLACK, font=font)
 
 # Draw the red, white, and red strips
 
