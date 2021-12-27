@@ -12,7 +12,7 @@ import json
 import config as cfg
 import math
 
-days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
+days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
 
 def drawSun():
     for x in range(weatherLeft, weatherRight):
@@ -59,23 +59,26 @@ def getNews():
     
     return news
 
+# Given font list, gets fonts from google fonts api if they don't already exist local
+# Maybe take in hash of names and font descriptors and return names and ttf file locations
+def getFonts(fontsToGet):
+    for font in fontsToGet:
+        print(font)
+
 try:
     inky_display = auto(ask_user=True, verbose=True)
 except TypeError:
     raise TypeError("You need to update the Inky library to >= v1.1.0")
 
 parser = argparse.ArgumentParser()
-# parser.add_argument('--name', '-n', type=str, required=True, help="Your name")
 args, _ = parser.parse_known_args()
 
-# inky_display.set_rotation(180)
 try:
     inky_display.set_border(inky_display.RED)
 except NotImplementedError:
     pass
 
 # Figure out scaling for display size
-
 scale_size = 1.0
 padding = 0
 
@@ -98,13 +101,16 @@ draw = ImageDraw.Draw(img)
 
 # Load the fonts
 
+fontsToLoad = ["Roboto+Condensed:wght@700"]
+getFonts(fontsToLoad)
+
 intuitive_font = ImageFont.truetype(Intuitive, int(22 * scale_size))
 hanken_bold_font = ImageFont.truetype(HankenGroteskBold, int(35 * scale_size))
 hanken_medium_font = ImageFont.truetype(HankenGroteskMedium, int(16 * scale_size))
 # ebeFont = ImageFont.truetype(font='./ebe.ttf', size=int(10 * scale_size))
 teleFont = ImageFont.truetype(font='./tele.ttf', size=int(10 * scale_size))
-dateFont = ImageFont.truetype(font='./tele.ttf', size=int(18 * scale_size))
-timeFont = ImageFont.truetype(font='./tele.ttf', size=int(48 * scale_size))
+dateFont = ImageFont.truetype(font='./michroma.ttf', size=int(10 * scale_size))
+timeFont = ImageFont.truetype(font='./michroma.ttf', size=int(32 * scale_size))
 headlineFont = ImageFont.truetype(font='./roboto.ttf', size=int(8 * scale_size))
 articleFont = ImageFont.truetype(font='./arimo.ttf', size=int(8 * scale_size))
 
@@ -172,11 +178,12 @@ now = datetime.now()
 # now = now - timedelta(hours=-7)
 time = now.strftime("%H:%M")
 date = now.strftime("%m/%d/%Y")
-day = days[now.weekday() + 1]
-vPadding = 2
+day = days[now.weekday()]
+vPadding = -22
 
 draw.text((0,vPadding), time, inky_display.BLACK, font=timeFont)
 timew, timeh = timeFont.getsize(time)
+vPadding = -20
 draw.text((0,timeh + vPadding), day + " " + date, inky_display.BLACK, font=dateFont)
 datew, dateh = dateFont.getsize(day + " " + date)
 
@@ -184,6 +191,7 @@ datew, dateh = dateFont.getsize(day + " " + date)
 
 font = headlineFont
 news = getNews()
+vPadding = 2
 for i,headline in enumerate(news):
 	headlinew, headlineh = font.getsize(headline[0])
 	summaryw, summaryh = font.getsize(headline[1])
